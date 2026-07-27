@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.temp
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# Large media files (if not needed in repo)
+*.glb
+*.stl
+*.3mf

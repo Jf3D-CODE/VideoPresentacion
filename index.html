@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="description" content="JF Diseños 3D - Donde la imaginación se imprime en la realidad. Impresión 3D, diseño y creación personalizada.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="JF Diseños 3D">
+<meta property="og:description" content="Descubrí tu mundo. Creá tu destino. Impresión 3D y diseño personalizado.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="musica/logo-website.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<title>JF DISEÑOS 3D</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Segoe UI',Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+
+#startScreen{position:fixed;inset:0;z-index:999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:opacity 1.5s}
+#startScreen.hide{opacity:0;pointer-events:none}
+#startScreen h1{font-size:clamp(2em,8vw,4em);font-weight:900;letter-spacing:.12em;background:linear-gradient(135deg,#1e90ff,#7b2ff7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 30px #1e90ff44);text-transform:uppercase}
+#startScreen .sub{color:#7b2ff7;font-size:clamp(.7em,2vw,1em);letter-spacing:.3em;margin-top:.3em}
+.ring{width:120px;height:120px;border-radius:50%;border:2px solid #1e90ff;display:flex;align-items:center;justify-content:center;margin-top:2em;animation:rp 2.5s ease-in-out infinite;position:relative}
+.ring::before,.ring::after{content:'';position:absolute;border-radius:50%;border:1px solid #1e90ff33}
+.ring::before{inset:-14px;animation:rp 2.5s ease-in-out infinite .3s}
+.ring::after{inset:-28px;animation:rp 2.5s ease-in-out infinite .6s}
+@keyframes rp{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.06);opacity:1}}
+.tri{width:0;height:0;border-top:16px solid transparent;border-bottom:16px solid transparent;border-left:28px solid #1e90ff;margin-left:10px;filter:drop-shadow(0 0 10px #1e90ff)}
+#startScreen .hint{margin-top:2.5em;color:#445;font-size:.75em;letter-spacing:.15em;text-transform:uppercase}
+
+#threeCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:1}
+#canvas2d{position:fixed;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+#crt{position:fixed;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.03) 0px,rgba(0,0,0,.03) 1px,transparent 1px,transparent 2px);opacity:.35}
+#flash{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:0;transition:opacity .04s}
+#transOverlay{position:fixed;inset:0;z-index:55;pointer-events:none;background:#000;opacity:0;transition:opacity .8s ease-in-out}
+#transOverlay.on{opacity:1}
+
+#subtitle{position:fixed;bottom:8%;left:50%;transform:translateX(-50%);z-index:60;max-width:85%;text-align:center;pointer-events:none}
+.sub-word{display:inline-block;font-size:clamp(.85em,2vw,1.15em);color:rgba(255,255,255,0);transition:color .35s,text-shadow .35s;text-shadow:0 0 15px transparent;margin:0 .12em;line-height:1.9;font-weight:500}
+.sub-word.show{color:rgba(255,255,255,.93);text-shadow:0 0 12px #1e90ff55,0 2px 12px #000}
+.sub-word.dim{color:rgba(255,255,255,.18);text-shadow:none}
+
+#finalScreen{position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5em;opacity:0;pointer-events:none;transition:opacity 2.5s;background:#000}
+#finalScreen.on{opacity:1;pointer-events:auto}
+.final-tagline{font-size:clamp(.8em,2vw,1.1em);letter-spacing:.25em;color:rgba(255,255,255,.75);text-shadow:0 0 15px #1e90ff33;animation:fadeUp 2s ease-out forwards}
+.final-sub{font-size:clamp(.6em,1.5vw,.85em);color:#7b2ff788;letter-spacing:.3em;animation:fadeUp 2s .5s ease-out forwards;opacity:0}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.final-btn{position:relative;display:inline-block;font-size:clamp(1em,2.5vw,1.4em);color:#1e90ff;text-decoration:none;letter-spacing:.15em;padding:1em 3em;border-radius:12px;background:rgba(0,212,255,.06);border:2px solid #1e90ff;transition:all .6s;overflow:visible;z-index:2;animation:fadeUp 2s 1s ease-out forwards;opacity:0;cursor:pointer}
+.final-btn:hover{background:rgba(0,212,255,.15);transform:scale(1.05);box-shadow:0 0 30px rgba(0,212,255,.3)}
+.aura{position:absolute;border-radius:50%;border:2px solid #1e90ff33;animation:auraSpin linear infinite;pointer-events:none}
+.aura1{inset:-30px;animation-duration:4s;border-color:#1e90ff44}
+.aura2{inset:-50px;animation-duration:6s;animation-direction:reverse;border-color:#7b2ff733}
+.aura3{inset:-70px;animation-duration:8s;border-color:#1e90ff22}
+@keyframes auraSpin{to{transform:rotate(360deg)}}
+.final-glow{position:absolute;inset:-60px;border-radius:12px;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,212,255,.18) 0%,rgba(123,47,247,.1) 40%,transparent 70%);animation:finalPulse 2s ease-in-out infinite;z-index:1}
+@keyframes finalPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <h1>JF DISEÑOS 3D</h1>
+  <div class="ring"><div class="tri"></div></div>
+  <div class="hint">Hacé click para empezar</div>
+</div>
+
+<audio id="bgMusic" preload="auto" loop><source src="musica/tema.mp3" type="audio/mpeg"></audio>
+<audio id="audio1" preload="auto"><source src="musica/Ecena 1.mp3" type="audio/mpeg"></audio>
+<audio id="audio2" preload="auto"><source src="musica/Ecena 2.mp3" type="audio/mpeg"></audio>
+<audio id="audio3" preload="auto"><source src="musica/Ecena 3.mp3" type="audio/mpeg"></audio>
+<audio id="audio4" preload="auto"><source src="musica/Ecena 4.mp3" type="audio/mpeg"></audio>
+<audio id="audio5" preload="auto"><source src="musica/Ecena 5.mp3" type="audio/mpeg"></audio>
+
+<canvas id="threeCanvas"></canvas>
+<canvas id="canvas2d"></canvas>
+<div id="crt"></div>
+<div id="flash"></div>
+<div id="transOverlay"></div>
+<div id="subtitle"></div>
+
+<div id="finalScreen">
+  <div class="final-tagline">DESCUBRÍ TU MUNDO. CREÁ TU DESTINO.</div>
+  <div style="position:relative;display:inline-block">
+    <div class="final-glow"></div>
+    <div class="aura aura1"></div><div class="aura aura2"></div><div class="aura aura3"></div>
+    <a class="final-btn" href="https://www.tienda-simple.com.ar/tienda/jf-disenos-3d" target="_blank">IR A LA TIENDA</a>
+  </div>
+  <div class="final-sub">JF DISEÑOS 3D</div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0 && window.innerWidth < 1024);
+const PR = IS_MOBILE ? 1.5 : Math.min(window.devicePixelRatio, 2);
+const PCOUNT = IS_MOBILE ? 80 : 180;
+
+const NARR = [
+  "Todo comenzó con una idea clara: transformar la creatividad en objetos reales. Una chispa que no quería perderse en el vacío se convirtió en el impulso de crear, de dar forma a lo invisible.",
+  "Los conceptos se convirtieron en diseños, los bocetos en estructuras sólidas. Cada figura representaba un paso hacia adelante, cada contorno era parte de una identidad que empezaba a tomar cuerpo.",
+  "El camino no fue sencillo. Hubo errores, pruebas fallidas y momentos de caos. Pero cada intento aportó aprendizaje, cada obstáculo fortaleció la visión. De ese proceso surgieron las primeras letras: JF Diseños 3D.",
+  "El orden reemplazó al caos y el nombre apareció completo. Azul y negro se entrelazaron en un símbolo tridimensional, sólido y profundo. Más que un logo, era la unión entre la mente y la máquina.",
+  "Así nació JF Diseños 3D: un espacio donde los pensamientos se convierten en objetos y la imaginación se imprime en la realidad. Descubrí tu mundo. Creá tu destino."
+];
+
+const threeCanvas = document.getElementById('threeCanvas');
+const canvas2d = document.getElementById('canvas2d');
+const ctx = canvas2d.getContext('2d');
+const flashEl = document.getElementById('flash');
+const transOverlay = document.getElementById('transOverlay');
+const subEl = document.getElementById('subtitle');
+const finalScreen = document.getElementById('finalScreen');
+const audioEls = [1,2,3,4,5].map(i => document.getElementById('audio' + i));
+const bgMusic = document.getElementById('bgMusic');
+
+const rand = (a, b) => Math.random() * (b - a) + a;
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, mn, mx) => Math.max(mn, Math.min(mx, v));
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+let flashTimer = null;
+function doFlash(ms, pk) {
+  flashEl.style.background = 'rgba(0,212,255,' + (pk || 0.5) + ')';
+  flashEl.style.opacity = '1';
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(() => { flashEl.style.opacity = '0'; }, ms || 60);
+}
+
+/* ==========================================
+   DESIGN LOGO - Canvas 2D programmatically
+   ========================================== */
+function createLogoCanvas(size, withCircle) {
+  const cv = document.createElement('canvas');
+  cv.width = size;
+  cv.height = size;
+  const c = cv.getContext('2d');
+  c.clearRect(0, 0, size, size);
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size * 0.42;
+  const blue = '#1e90ff';
+  const blueGlow = 'rgba(30,144,255,0.7)';
+  const blueGlowSoft = 'rgba(30,144,255,0.35)';
+
+  // Blue glow behind circle
+  if (withCircle !== false) {
+    const glowGrad = c.createRadialGradient(cx, cy, r * 0.5, cx, cy, r * 1.4);
+    glowGrad.addColorStop(0, 'rgba(30,144,255,0.4)');
+    glowGrad.addColorStop(0.5, 'rgba(30,144,255,0.15)');
+    glowGrad.addColorStop(1, 'transparent');
+    c.fillStyle = glowGrad;
+    c.fillRect(0, 0, size, size);
+
+    // Partial circle — missing bottom-left (like the CSS reference)
+    // Draw arc from -30deg to 225deg (skipping bottom-left quadrant)
+    c.beginPath();
+    c.arc(cx, cy, r, -0.5, Math.PI * 0.75);
+    c.strokeStyle = blue;
+    c.lineWidth = size * 0.04;
+    c.lineCap = 'round';
+    c.stroke();
+
+    // Circle glow layer
+    c.beginPath();
+    c.arc(cx, cy, r, -0.5, Math.PI * 0.75);
+    c.strokeStyle = blueGlow;
+    c.lineWidth = size * 0.08;
+    c.stroke();
+
+    // Second glow pass (softer, wider)
+    c.beginPath();
+    c.arc(cx, cy, r, -0.5, Math.PI * 0.75);
+    c.strokeStyle = blueGlowSoft;
+    c.lineWidth = size * 0.14;
+    c.stroke();
+  }
+
+  const sw = size * 0.06;
+
+  // "J" letter — bold: vertical + horizontal bar at bottom
+  const jx = cx - size * 0.13;
+  const jTop = cy - size * 0.17;
+  const jBot = cy + size * 0.17;
+  const jBarW = size * 0.14;
+
+  // J glow
+  c.beginPath();
+  c.strokeStyle = blueGlow;
+  c.lineWidth = sw * 2;
+  c.lineCap = 'square';
+  c.lineJoin = 'miter';
+  c.moveTo(jx, jTop);
+  c.lineTo(jx, jBot);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(jx, jBot);
+  c.lineTo(jx - jBarW, jBot);
+  c.stroke();
+
+  // J main
+  c.beginPath();
+  c.strokeStyle = blue;
+  c.lineWidth = sw;
+  c.lineCap = 'square';
+  c.lineJoin = 'miter';
+  c.moveTo(jx, jTop);
+  c.lineTo(jx, jBot);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(jx, jBot);
+  c.lineTo(jx - jBarW, jBot);
+  c.stroke();
+
+  // "F" letter — bold: vertical + top bar + middle bar
+  const fx = cx + size * 0.05;
+  const fTop = cy - size * 0.17;
+  const fBot = cy + size * 0.17;
+  const fTopW = size * 0.17;
+  const fMidW = size * 0.12;
+  const fMidY = cy - size * 0.01;
+
+  // F glow
+  c.beginPath();
+  c.strokeStyle = blueGlow;
+  c.lineWidth = sw * 2;
+  c.lineCap = 'square';
+  c.moveTo(fx, fTop);
+  c.lineTo(fx, fBot);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(fx, fTop);
+  c.lineTo(fx + fTopW, fTop);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(fx, fMidY);
+  c.lineTo(fx + fMidW, fMidY);
+  c.stroke();
+
+  // F main
+  c.beginPath();
+  c.strokeStyle = blue;
+  c.lineWidth = sw;
+  c.lineCap = 'square';
+  c.moveTo(fx, fTop);
+  c.lineTo(fx, fBot);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(fx, fTop);
+  c.lineTo(fx + fTopW, fTop);
+  c.stroke();
+  c.beginPath();
+  c.moveTo(fx, fMidY);
+  c.lineTo(fx + fMidW, fMidY);
+  c.stroke();
+
+  return cv;
+}
+
+// Create logo textures
+const logoCanvas = createLogoCanvas(512, true);
+const logoTexture = new THREE.CanvasTexture(logoCanvas);
+logoTexture.minFilter = THREE.LinearFilter;
+
+const logoNoCircleCanvas = createLogoCanvas(512, false);
+const logoNoCircleTexture = new THREE.CanvasTexture(logoNoCircleCanvas);
+logoNoCircleTexture.minFilter = THREE.LinearFilter;
+
+/* ==========================================
+   THREE.JS SETUP
+   ========================================== */
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000000, 0.02);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(0, 1.5, 12);
+
+const renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, antialias: !IS_MOBILE, alpha: true });
+renderer.setPixelRatio(PR);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.3;
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloomPass = new UnrealBloomPass(
+  new THREE.Vector2(window.innerWidth * (IS_MOBILE ? 0.5 : 1), window.innerHeight * (IS_MOBILE ? 0.5 : 1)),
+  1.6, 0.4, 0.8
+);
+composer.addPass(bloomPass);
+composer.addPass(new OutputPass());
+
+scene.add(new THREE.AmbientLight(0x0a0a20, 0.5));
+const pLight = new THREE.PointLight(0x1e90ff, 2, 30);
+pLight.position.set(0, 3, 0);
+scene.add(pLight);
+const pLight2 = new THREE.PointLight(0x7b2ff7, 1, 20);
+pLight2.position.set(-3, 1, -3);
+scene.add(pLight2);
+
+function resize2D() {
+  canvas2d.width = window.innerWidth * (IS_MOBILE ? 0.5 : 0.7);
+  canvas2d.height = window.innerHeight * (IS_MOBILE ? 0.5 : 0.7);
+}
+resize2D();
+
+let sceneGroup = new THREE.Group();
+scene.add(sceneGroup);
+
+function clearScene() {
+  sceneGroup.traverse(c => {
+    if (c.geometry) c.geometry.dispose();
+    if (c.material) {
+      if (Array.isArray(c.material)) c.material.forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
+      else { if (c.material.map) c.material.map.dispose(); c.material.dispose(); }
+    }
+  });
+  scene.remove(sceneGroup);
+  sceneGroup = new THREE.Group();
+  scene.add(sceneGroup);
+}
+
+/* ==========================================
+   S1: NÚCLEO ELÉCTRICO
+   ========================================== */
+let s1Core, s1Glow, s1Rings = [], s1Particles;
+
+function createS1() {
+  const coreGeo = new THREE.IcosahedronGeometry(0.5, 2);
+  const coreMat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, transparent: true, opacity: 0.9, wireframe: true });
+  s1Core = new THREE.Mesh(coreGeo, coreMat);
+  sceneGroup.add(s1Core);
+
+  const innerGeo = new THREE.SphereGeometry(0.25, 16, 16);
+  const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 });
+  const inner = new THREE.Mesh(innerGeo, innerMat);
+  inner.name = 's1inner';
+  sceneGroup.add(inner);
+
+  const glowGeo = new THREE.SphereGeometry(1.2, 16, 16);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, transparent: true, opacity: 0.08, side: THREE.BackSide });
+  s1Glow = new THREE.Mesh(glowGeo, glowMat);
+  sceneGroup.add(s1Glow);
+
+  for (let i = 0; i < 8; i++) {
+    const ringGeo = new THREE.RingGeometry(1.8 + i * 0.4, 1.85 + i * 0.4, 64);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: i % 3 === 0 ? 0x7b2ff7 : 0x1e90ff,
+      transparent: true, opacity: 0.18 - i * 0.018, side: THREE.DoubleSide
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2 + rand(-0.4, 0.4);
+    ring.rotation.z = rand(0, Math.PI);
+    ring.userData.idx = i;
+    s1Rings.push(ring);
+    sceneGroup.add(ring);
+  }
+
+  const count = PCOUNT;
+  const positions = new Float32Array(count * 3);
+  const basePositions = new Float32Array(count * 3);
+  const speeds = new Float32Array(count);
+  for (let i = 0; i < count; i++) {
+    const a = rand(0, Math.PI * 2);
+    const d = rand(0.5, 5);
+    const h = (Math.random() - 0.5) * 3;
+    positions[i * 3] = Math.cos(a) * d;
+    positions[i * 3 + 1] = h;
+    positions[i * 3 + 2] = Math.sin(a) * d;
+    basePositions[i * 3] = positions[i * 3];
+    basePositions[i * 3 + 1] = positions[i * 3 + 1];
+    basePositions[i * 3 + 2] = positions[i * 3 + 2];
+    speeds[i] = rand(0.5, 2);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({
+    size: 0.05, color: 0x1e90ff, transparent: true, opacity: 0.85,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  s1Particles = new THREE.Points(geo, mat);
+  s1Particles.userData.basePos = basePositions;
+  s1Particles.userData.speeds = speeds;
+  sceneGroup.add(s1Particles);
+}
+
+function updateS1(t, p) {
+  if (!s1Core) return;
+  const pulse = Math.sin(t * 4) * 0.15;
+  s1Core.rotation.x += 0.01; s1Core.rotation.y += 0.015;
+  s1Core.scale.setScalar(0.5 + p * 0.5 + pulse);
+  s1Core.material.opacity = 0.4 + p * 0.5;
+
+  const inner = sceneGroup.getObjectByName('s1inner');
+  if (inner) { inner.scale.setScalar(1 + Math.sin(t * 6) * 0.1); inner.material.opacity = 0.6 + Math.sin(t * 3) * 0.2; }
+  if (s1Glow) { s1Glow.scale.setScalar(1 + p * 3 + Math.sin(t * 2) * 0.2); s1Glow.material.opacity = 0.05 + p * 0.08; }
+
+  for (const ring of s1Rings) {
+    const i = ring.userData.idx;
+    ring.scale.setScalar(1 + Math.sin(t * 1.8 + i * 0.6) * 0.25);
+    ring.rotation.z += 0.003 * (i % 2 ? 1 : -1);
+    ring.material.opacity = (0.18 - i * 0.018) * Math.min(p * 3, 1);
+  }
+
+  if (s1Particles) {
+    const pos = s1Particles.geometry.attributes.position;
+    const base = s1Particles.userData.basePos;
+    const speeds = s1Particles.userData.speeds;
+    const breathe = Math.sin(t * 2.5) * 0.5;
+    for (let i = 0; i < pos.count; i++) {
+      const factor = 1 + breathe * (0.3 + 0.7 * Math.sin(i * 0.05 + t * speeds[i]));
+      pos.array[i * 3] = base[i * 3] * factor;
+      pos.array[i * 3 + 1] = base[i * 3 + 1] * factor;
+      pos.array[i * 3 + 2] = base[i * 3 + 2] * factor;
+    }
+    pos.needsUpdate = true;
+    s1Particles.rotation.y += 0.004;
+    s1Particles.rotation.x += 0.002;
+    s1Particles.material.opacity = 0.4 + p * 0.5;
+  }
+}
+
+/* ==========================================
+   S2: LOGO CONSTRUYÉNDOSE
+   ========================================== */
+let s2WireCircle = null, s2Strokes = [], s2Sparks = [], s2Logo = null, s2ArcTrails = [];
+
+function createS2() {
+  // Wireframe circle being drawn
+  const circleGeo = new THREE.RingGeometry(1.55, 1.65, 64);
+  const circleMat = new THREE.MeshBasicMaterial({
+    color: 0x1e90ff, transparent: true, opacity: 0, side: THREE.DoubleSide, wireframe: true
+  });
+  s2WireCircle = new THREE.Mesh(circleGeo, circleMat);
+  s2WireCircle.name = 's2wire';
+  sceneGroup.add(s2WireCircle);
+
+  // Metallic strokes (partial circle arcs) — now 8 arcs for more drama
+  for (let i = 0; i < 8; i++) {
+    const arcGeo = new THREE.RingGeometry(1.45, 1.75, 32, 1, (i / 8) * Math.PI * 2, Math.PI / 3.5);
+    const arcMat = new THREE.MeshStandardMaterial({
+      color: 0x1e90ff, metalness: 0.9, roughness: 0.1,
+      transparent: true, opacity: 0, side: THREE.DoubleSide,
+      emissive: 0x1e90ff, emissiveIntensity: 0.4
+    });
+    const arc = new THREE.Mesh(arcGeo, arcMat);
+    arc.userData.delay = i * 0.08;
+    arc.userData.idx = i;
+    arc.userData.assembled = false;
+    s2Strokes.push(arc);
+    sceneGroup.add(arc);
+  }
+
+  // Arc trails — glowing lines that follow arcs as they assemble
+  for (let i = 0; i < 8; i++) {
+    const trailGeo = new THREE.RingGeometry(1.5, 1.7, 32, 1, (i / 8) * Math.PI * 2, Math.PI / 6);
+    const trailMat = new THREE.MeshBasicMaterial({
+      color: 0x1e90ff, transparent: true, opacity: 0, side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const trail = new THREE.Mesh(trailGeo, trailMat);
+    trail.userData.idx = i;
+    s2ArcTrails.push(trail);
+    sceneGroup.add(trail);
+  }
+
+  // Logo (incomplete, building)
+  const logoGeo = new THREE.PlaneGeometry(3, 3);
+  const logoMat = new THREE.MeshBasicMaterial({
+    map: logoTexture.clone(), transparent: true, opacity: 0, side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  s2Logo = new THREE.Mesh(logoGeo, logoMat);
+  s2Logo.position.y = 0;
+  s2Logo.name = 's2logo';
+  sceneGroup.add(s2Logo);
+
+  // Spark particles — more sparks, more dynamic
+  for (let i = 0; i < 50; i++) {
+    const sparkGeo = new THREE.SphereGeometry(rand(0.02, 0.07), 4, 4);
+    const sparkMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0x1e90ff : 0x7b2ff7, transparent: true, opacity: 0 });
+    const spark = new THREE.Mesh(sparkGeo, sparkMat);
+    const a = rand(0, Math.PI * 2);
+    spark.position.set(Math.cos(a) * rand(1.5, 3), rand(-1.5, 1.5), Math.sin(a) * rand(1.5, 3));
+    spark.userData.basePos = spark.position.clone();
+    spark.userData.delay = rand(0, 0.8);
+    spark.userData.speed = rand(0.01, 0.04);
+    spark.userData.orbitR = rand(1.5, 3);
+    spark.userData.burst = Math.random() > 0.7;
+    s2Sparks.push(spark);
+    sceneGroup.add(spark);
+  }
+}
+
+function updateS2(t, p) {
+  const wire = sceneGroup.getObjectByName('s2wire');
+  if (wire) {
+    wire.material.opacity = clamp(p * 1.5, 0, 1) * 0.3;
+    wire.rotation.z = t * 0.3;
+    wire.scale.setScalar(1 + Math.sin(t * 3) * 0.05);
+  }
+
+  // Arcs assemble with dramatic rotation and flash
+  for (const arc of s2Strokes) {
+    const ap = clamp((p - arc.userData.delay) / 0.35, 0, 1);
+    if (ap <= 0) continue;
+    const ep = easeOut(ap);
+    arc.material.opacity = ep * 0.75;
+    // Dramatic spin-in effect
+    arc.rotation.z = t * 0.5 + arc.userData.idx * 0.4 + (1 - ep) * Math.PI * 2;
+    arc.material.emissiveIntensity = 0.3 + Math.sin(t * 5 + arc.userData.idx) * 0.3 + (ap < 0.3 ? 0.6 : 0);
+    // Scale burst on arrival
+    const scalePulse = ap > 0.8 ? 1 + (1 - ap) * 2 : 1 + Math.sin(t * 6) * 0.08;
+    arc.scale.setScalar(scalePulse);
+    if (!arc.userData.assembled && ap > 0.9) {
+      arc.userData.assembled = true;
+      doFlash(25, 0.15);
+    }
+  }
+
+  // Arc trails glow during assembly
+  for (const trail of s2ArcTrails) {
+    const tp = clamp((p - trail.userData.idx * 0.08) / 0.2, 0, 1);
+    const fadeP = clamp((p - trail.userData.idx * 0.08 - 0.15) / 0.15, 0, 1);
+    trail.material.opacity = tp > 0 && fadeP < 1 ? (1 - fadeP) * 0.5 : 0;
+    trail.rotation.z = t * 0.5 + trail.userData.idx * 0.4;
+  }
+
+  // Logo appears with shake and scale burst
+  const logo = sceneGroup.getObjectByName('s2logo');
+  if (logo) {
+    const lp = clamp((p - 0.25) / 0.65, 0, 1);
+    if (lp > 0) {
+      const ep = easeOut(lp);
+      logo.material.opacity = ep * 0.85;
+      const logoScale = ep * (1 + (lp < 0.15 ? Math.sin(lp / 0.15 * Math.PI) * 0.3 : 0));
+      logo.scale.set(logoScale, logoScale, 1);
+      if (lp < 0.5) {
+        logo.position.x = (Math.random() - 0.5) * 0.25 * (1 - lp / 0.5);
+        logo.position.y = (Math.random() - 0.5) * 0.1 * (1 - lp / 0.5);
+        logo.rotation.z = (Math.random() - 0.5) * 0.08 * (1 - lp / 0.5);
+      } else {
+        logo.position.x = 0;
+        logo.position.y = 0;
+        logo.rotation.z = 0;
+      }
+    }
+  }
+
+  // Sparks orbit and burst
+  for (const spark of s2Sparks) {
+    const sp = clamp((p - spark.userData.delay) / 0.4, 0, 1);
+    if (sp <= 0) continue;
+    const angle = t * spark.userData.speed * 12 + spark.userData.delay * 5;
+    const r = spark.userData.orbitR * (1 + Math.sin(t * 3 + spark.userData.delay * 8) * 0.2);
+    spark.position.x = Math.cos(angle) * r;
+    spark.position.z = Math.sin(angle) * r;
+    spark.position.y = Math.sin(t * 2.5 + spark.userData.delay * 3) * 0.7;
+    const opacity = sp * (0.4 + Math.sin(t * 6 + spark.userData.delay * 10) * 0.35);
+    spark.material.opacity = opacity;
+    // Burst sparks fly outward briefly
+    if (spark.userData.burst && sp > 0.5 && sp < 0.7) {
+      spark.position.multiplyScalar(1 + (sp - 0.5) * 3);
+    }
+  }
+}
+
+/* ==========================================
+   S3: GLITCH - LOGO SE FRAGMENTA
+   ========================================== */
+let s3Frags = [], s3Lines = [], s3GlitchI = 0;
+let s3CamShake = { x: 0, y: 0 };
+let s3LogoFragments = [];
+
+function createS3() {
+  // Logo fragments
+  for (let i = 0; i < 8; i++) {
+    const fragGeo = new THREE.PlaneGeometry(rand(0.8, 1.5), rand(0.8, 1.5));
+    const fragMat = new THREE.MeshBasicMaterial({
+      map: logoTexture.clone(), transparent: true, opacity: 0, side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    const frag = new THREE.Mesh(fragGeo, fragMat);
+    frag.position.set(rand(-3, 3), rand(-2, 2), rand(-2, 2));
+    frag.userData.basePos = frag.position.clone();
+    frag.userData.glitchOff = new THREE.Vector3();
+    frag.userData.rotSpd = new THREE.Vector3(rand(-0.06, 0.06), rand(-0.06, 0.06), rand(-0.04, 0.04));
+    frag.userData.flashTimer = 0;
+    s3LogoFragments.push(frag);
+    sceneGroup.add(frag);
+  }
+
+  // Geometric debris
+  for (let i = 0; i < 20; i++) {
+    const geo = new THREE.BoxGeometry(rand(0.1, 0.8), rand(0.1, 0.6), rand(0.02, 0.15));
+    const mat = new THREE.MeshBasicMaterial({
+      color: Math.random() > 0.5 ? 0x1e90ff : 0x7b2ff7, transparent: true, opacity: 0
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(rand(-5, 5), rand(-3, 3), rand(-4, 4));
+    mesh.userData.basePos = mesh.position.clone();
+    mesh.userData.glitchOff = new THREE.Vector3();
+    mesh.userData.rotSpd = new THREE.Vector3(rand(-0.08, 0.08), rand(-0.08, 0.08), rand(-0.05, 0.05));
+    mesh.userData.flashTimer = 0;
+    s3Frags.push(mesh);
+    sceneGroup.add(mesh);
+  }
+
+  // Glitch lines
+  for (let i = 0; i < 15; i++) {
+    const geo = new THREE.PlaneGeometry(rand(2, 10), 0.015);
+    const mat = new THREE.MeshBasicMaterial({
+      color: i % 3 === 0 ? 0xff0033 : (i % 3 === 1 ? 0x1e90ff : 0x00ff88),
+      transparent: true, opacity: 0, side: THREE.DoubleSide
+    });
+    const line = new THREE.Mesh(geo, mat);
+    line.position.set(rand(-4, 4), rand(-2.5, 2.5), rand(-3, 3));
+    line.name = 'gline' + i;
+    s3Lines.push(line);
+    sceneGroup.add(line);
+  }
+
+  // Chromatic aberration
+  for (let i = 0; i < 3; i++) {
+    const geo = new THREE.PlaneGeometry(14, 9);
+    const mat = new THREE.MeshBasicMaterial({
+      color: [0xff0000, 0x00ff00, 0x0000ff][i],
+      transparent: true, opacity: 0, side: THREE.DoubleSide
+    });
+    const plane = new THREE.Mesh(geo, mat);
+    plane.position.z = -5 + i * 0.5;
+    plane.name = 'chroma' + i;
+    sceneGroup.add(plane);
+  }
+}
+
+function updateS3(t, p) {
+  s3GlitchI = p < 0.7 ? Math.sin(p * 28) * 0.5 + 0.5 : Math.max(0, 1 - (p - 0.7) / 0.3);
+
+  if (s3GlitchI > 0.3) {
+    s3CamShake.x = (Math.random() - 0.5) * 0.18 * s3GlitchI;
+    s3CamShake.y = (Math.random() - 0.5) * 0.12 * s3GlitchI;
+  } else {
+    s3CamShake.x *= 0.9; s3CamShake.y *= 0.9;
+  }
+
+  const fragFade = p > 0.7 ? clamp((0.95 - p) / 0.25, 0, 1) : 1;
+  for (const frag of s3LogoFragments) {
+    const fp = clamp(p * 1.8, 0, 1);
+    frag.material.opacity = fp * 0.7 * fragFade;
+    frag.rotation.x += frag.userData.rotSpd.x * (1 + s3GlitchI * 2);
+    frag.rotation.y += frag.userData.rotSpd.y * (1 + s3GlitchI * 2);
+    frag.rotation.z += frag.userData.rotSpd.z;
+    if (Math.random() < s3GlitchI * 0.5) {
+      frag.userData.glitchOff.set(rand(-1, 1), rand(-0.8, 0.8), rand(-0.5, 0.5));
+      frag.userData.flashTimer = 4;
+    }
+    frag.userData.glitchOff.multiplyScalar(0.82);
+    frag.position.copy(frag.userData.basePos).add(frag.userData.glitchOff);
+    if (frag.userData.flashTimer > 0) { frag.material.opacity = 0.9 * fragFade; frag.userData.flashTimer--; }
+  }
+
+  for (const frag of s3Frags) {
+    const fp = clamp(p * 1.5, 0, 1);
+    frag.material.opacity = fp * 0.5 * fragFade;
+    frag.rotation.x += frag.userData.rotSpd.x * (1 + s3GlitchI);
+    frag.rotation.y += frag.userData.rotSpd.y * (1 + s3GlitchI);
+    frag.rotation.z += frag.userData.rotSpd.z;
+    if (Math.random() < s3GlitchI * 0.4) {
+      frag.userData.glitchOff.set(rand(-0.8, 0.8), rand(-0.5, 0.5), rand(-0.3, 0.3));
+      frag.userData.flashTimer = 5;
+    }
+    frag.userData.glitchOff.multiplyScalar(0.85);
+    frag.position.copy(frag.userData.basePos).add(frag.userData.glitchOff);
+    if (frag.userData.flashTimer > 0) { frag.material.opacity = 0.8 * fragFade; frag.userData.flashTimer--; }
+  }
+
+  for (const line of s3Lines) {
+    const lineFade = p > 0.7 ? clamp((0.9 - p) / 0.2, 0, 1) : 1;
+    line.visible = Math.random() < s3GlitchI * 0.6 * lineFade;
+    if (line.visible) {
+      line.position.y = rand(-2.5, 2.5);
+      line.material.opacity = rand(0.1, 0.4) * lineFade;
+      line.scale.x = rand(0.5, 2.5);
+    }
+  }
+
+  for (let i = 0; i < 3; i++) {
+    const chroma = sceneGroup.getObjectByName('chroma' + i);
+    if (chroma) {
+      chroma.visible = s3GlitchI > 0.5;
+      chroma.material.opacity = s3GlitchI > 0.5 ? 0.03 * s3GlitchI : 0;
+      chroma.position.x = (Math.random() - 0.5) * 0.4 * s3GlitchI;
+    }
+  }
+}
+
+/* ==========================================
+   S4: LOGO COMPLETO 3D
+   ========================================== */
+let s4Logo = null, s4Text = null, s4BurstParticles = [], s4Shockwave = null;
+
+function createS4() {
+  const logoGeo = new THREE.PlaneGeometry(4, 4);
+  const logoMat = new THREE.MeshStandardMaterial({
+    map: logoTexture.clone(), transparent: true, opacity: 0, side: THREE.DoubleSide,
+    metalness: 0.7, roughness: 0.2, emissive: 0x1e90ff, emissiveIntensity: 0.2
+  });
+  s4Logo = new THREE.Mesh(logoGeo, logoMat);
+  s4Logo.position.y = 0.5;
+  s4Logo.position.z = 8;
+  s4Logo.scale.setScalar(0.01);
+  s4Logo.name = 's4logo';
+  sceneGroup.add(s4Logo);
+
+  // "DISEÑOS 3D" text — Arial Black azul, simple
+  const cv = document.createElement('canvas');
+  cv.width = 512; cv.height = 128;
+  const c = cv.getContext('2d');
+  c.clearRect(0, 0, 512, 128);
+  c.font = '900 58px "Arial Black", sans-serif';
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillStyle = '#1e90ff';
+  c.fillText('DISEÑOS 3D', 256, 64);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.minFilter = THREE.LinearFilter;
+  const textGeo = new THREE.PlaneGeometry(4, 1);
+  const textMat = new THREE.MeshBasicMaterial({
+    map: tex, transparent: true, opacity: 0, side: THREE.DoubleSide,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  s4Text = new THREE.Mesh(textGeo, textMat);
+  s4Text.position.y = -1.8;
+  s4Text.position.z = 6;
+  s4Text.name = 's4text';
+  sceneGroup.add(s4Text);
+
+  // Shockwave ring
+  const swGeo = new THREE.RingGeometry(0.1, 0.3, 64);
+  const swMat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, transparent: true, opacity: 0, side: THREE.DoubleSide });
+  s4Shockwave = new THREE.Mesh(swGeo, swMat);
+  s4Shockwave.position.z = 0;
+  s4Shockwave.name = 's4shockwave';
+  sceneGroup.add(s4Shockwave);
+
+  // Halo
+  const haloGeo = new THREE.RingGeometry(0, 4, 64);
+  const haloMat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, transparent: true, opacity: 0, side: THREE.DoubleSide });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.position.z = -1;
+  halo.name = 's4halo';
+  sceneGroup.add(halo);
+
+  // Underline
+  const ulGeo = new THREE.PlaneGeometry(0, 0.035);
+  const ulMat = new THREE.MeshBasicMaterial({ color: 0x7b2ff7, transparent: true, opacity: 0, side: THREE.DoubleSide });
+  const ul = new THREE.Mesh(ulGeo, ulMat);
+  ul.position.y = -2.4;
+  ul.name = 's4underline';
+  sceneGroup.add(ul);
+
+  // Burst particles — exploding outward from center
+  const bCount = IS_MOBILE ? 40 : 80;
+  s4BurstParticles = [];
+  for (let i = 0; i < bCount; i++) {
+    const geo = new THREE.SphereGeometry(rand(0.02, 0.08), 4, 4);
+    const mat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.3 ? 0x1e90ff : 0x7b2ff7, transparent: true, opacity: 0 });
+    const mesh = new THREE.Mesh(geo, mat);
+    const angle = rand(0, Math.PI * 2);
+    const angleV = rand(-Math.PI * 0.5, Math.PI * 0.5);
+    const speed = rand(3, 12);
+    mesh.userData.dir = new THREE.Vector3(Math.cos(angle) * Math.cos(angleV), Math.sin(angleV), Math.sin(angle) * Math.cos(angleV));
+    mesh.userData.speed = speed;
+    mesh.userData.delay = rand(0, 0.15);
+    mesh.userData.life = rand(0.6, 1.2);
+    s4BurstParticles.push(mesh);
+    sceneGroup.add(mesh);
+  }
+
+  // Energy core — bright flash at center
+  const coreGeo = new THREE.SphereGeometry(0.3, 16, 16);
+  const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  core.name = 's4core';
+  core.position.z = 1;
+  sceneGroup.add(core);
+}
+
+function updateS4(t, p) {
+  // Logo entrance: dramatic fly-in from far with scale burst
+  const logo = sceneGroup.getObjectByName('s4logo');
+  if (logo) {
+    const revealP = clamp((p - 0.05) / 0.25, 0, 1);
+    const ep = easeOut(revealP);
+    // Fly in from far Z with scale
+    logo.position.z = lerp(8, 0, ep);
+    logo.position.y = lerp(3, 0.5, ep);
+    logo.scale.setScalar(ep * (1 + Math.sin(t * 2) * 0.02));
+    logo.material.opacity = ep * 0.95;
+    logo.material.emissiveIntensity = 0.15 + Math.sin(t * 3) * 0.1 + (revealP > 0.9 ? 0.5 * Math.sin(t * 8) : 0);
+    if (revealP < 0.4) logo.position.x = (Math.random() - 0.5) * 0.3 * (1 - revealP / 0.4);
+    else logo.position.x = 0;
+  }
+
+  // Energy core flash
+  const core = sceneGroup.getObjectByName('s4core');
+  if (core) {
+    const cp = clamp((p - 0.03) / 0.08, 0, 1);
+    const flashIntensity = cp < 0.5 ? cp * 2 : Math.max(0, 1 - (cp - 0.5) * 4);
+    core.material.opacity = flashIntensity;
+    core.scale.setScalar(1 + flashIntensity * 3);
+  }
+
+  // Shockwave ring — expanding rapidly after reveal
+  const sw = sceneGroup.getObjectByName('s4shockwave');
+  if (sw) {
+    const sp = clamp((p - 0.12) / 0.3, 0, 1);
+    if (sp > 0 && sp < 1) {
+      sw.scale.setScalar(1 + sp * 18);
+      sw.material.opacity = (1 - sp) * 0.6;
+      sw.material.color.setHex(sp < 0.3 ? 0xffffff : 0x1e90ff);
+    } else {
+      sw.material.opacity = 0;
+    }
+  }
+
+  // Burst particles — explode outward
+  for (const bp of s4BurstParticles) {
+    const bp2 = clamp((p - bp.userData.delay - 0.08) / bp.userData.life, 0, 1);
+    if (bp2 <= 0 || bp2 >= 1) { bp.material.opacity = 0; continue; }
+    const easeBp = easeOut(bp2);
+    bp.position.copy(bp.userData.dir).multiplyScalar(easeBp * bp.userData.speed);
+    bp.material.opacity = (1 - bp2) * 0.9;
+    bp.scale.setScalar(1 - bp2 * 0.5);
+  }
+
+  // Text "DISEÑOS 3D" — slides up with glow
+  const text = sceneGroup.getObjectByName('s4text');
+  if (text) {
+    const tp = easeOut(clamp((p - 0.35) / 0.35, 0, 1));
+    text.material.opacity = tp * 0.85;
+    text.position.z = lerp(6, 0, tp);
+    text.position.y = lerp(-4, -1.8, tp);
+  }
+
+  // Halo — expanding glow behind logo
+  const halo = sceneGroup.getObjectByName('s4halo');
+  if (halo) {
+    const hp = clamp((p - 0.1) / 0.5, 0, 1);
+    halo.material.opacity = hp * 0.2 * (1 - hp * 0.5);
+    halo.scale.setScalar(1 + hp * 3 + Math.sin(t * 2) * 0.1);
+  }
+
+  // Underline — wipes in from center
+  const ul = sceneGroup.getObjectByName('s4underline');
+  if (ul) {
+    const ulp = easeOut(clamp((p - 0.65) / 0.25, 0, 1));
+    ul.material.opacity = ulp * 0.8;
+    ul.scale.x = ulp * 9;
+  }
+}
+
+/* ==========================================
+   S5: LOGO FINAL + PORTAL
+   ========================================== */
+let s5Portal = null, s5PortalInner = null, s5Rings = [];
+
+function createS5() {
+  const logoGeo = new THREE.PlaneGeometry(4.5, 4.5);
+  const logoMat = new THREE.MeshBasicMaterial({
+    map: logoTexture.clone(), transparent: true, opacity: 0.95, side: THREE.DoubleSide
+  });
+  const logo = new THREE.Mesh(logoGeo, logoMat);
+  logo.position.y = 0.5;
+  logo.name = 's5logo';
+  sceneGroup.add(logo);
+
+  const portalGeo = new THREE.RingGeometry(2.5, 5, 64);
+  const portalMat = new THREE.MeshBasicMaterial({ color: 0x1e90ff, transparent: true, opacity: 0.12, side: THREE.DoubleSide });
+  s5Portal = new THREE.Mesh(portalGeo, portalMat);
+  s5Portal.position.z = -3;
+  sceneGroup.add(s5Portal);
+
+  const innerGeo = new THREE.CircleGeometry(2.5, 64);
+  const innerMat = new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: { uTime: { value: 0 }, uColor1: { value: new THREE.Color(0x000510) }, uColor2: { value: new THREE.Color(0x001030) } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+    fragmentShader: `uniform float uTime; uniform vec3 uColor1; uniform vec3 uColor2; varying vec2 vUv; void main(){ float d=length(vUv-0.5)*2.; float n=sin(d*10.-uTime*3.)*.5+.5; vec3 col=mix(uColor1,uColor2,n); float alpha=smoothstep(1.,0.3,d)*0.7; gl_FragColor=vec4(col,alpha); }`
+  });
+  s5PortalInner = new THREE.Mesh(innerGeo, innerMat);
+  s5PortalInner.position.z = -3.1;
+  sceneGroup.add(s5PortalInner);
+
+  for (let i = 0; i < 5; i++) {
+    const rGeo = new THREE.RingGeometry(3 + i * 0.35, 3.05 + i * 0.35, 64);
+    const rMat = new THREE.MeshBasicMaterial({
+      color: i % 2 === 0 ? 0x1e90ff : 0x7b2ff7, transparent: true, opacity: 0.15, side: THREE.DoubleSide
+    });
+    const ring = new THREE.Mesh(rGeo, rMat);
+    ring.position.z = -3;
+    ring.userData.idx = i;
+    s5Rings.push(ring);
+    sceneGroup.add(ring);
+  }
+
+  const starCount = IS_MOBILE ? 30 : 80;
+  const starPos = new Float32Array(starCount * 3);
+  for (let i = 0; i < starCount; i++) {
+    const a = rand(0, Math.PI * 2);
+    const r = rand(0.3, 2.2);
+    starPos[i * 3] = Math.cos(a) * r;
+    starPos[i * 3 + 1] = Math.sin(a) * r;
+    starPos[i * 3 + 2] = -3.2;
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  const starMat = new THREE.PointsMaterial({
+    size: 0.04, color: 0xffffff, transparent: true, opacity: 0.6,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const stars = new THREE.Points(starGeo, starMat);
+  stars.name = 's5stars';
+  sceneGroup.add(stars);
+}
+
+function updateS5(t, p) {
+  const logoP = easeOut(clamp(p / 0.3, 0, 1));
+  const logo = sceneGroup.getObjectByName('s5logo');
+  if (logo) { logo.rotation.y = Math.sin(t * 0.6) * 0.1; logo.scale.setScalar(logoP); }
+
+  const portalP = clamp((p - 0.2) / 0.4, 0, 1);
+  if (s5Portal) { s5Portal.material.opacity = portalP * (0.1 + Math.sin(t * 2) * 0.04); s5Portal.scale.setScalar(1 + Math.sin(t * 2.5) * 0.04); }
+  if (s5PortalInner) { s5PortalInner.material.uniforms.uTime.value = t * 1.5; s5PortalInner.material.opacity = portalP * 0.7; }
+
+  for (const ring of s5Rings) {
+    ring.rotation.z += 0.008 * (ring.userData.idx % 2 ? 1 : -1);
+    ring.material.opacity = portalP * (0.12 + Math.sin(t * 2 + ring.userData.idx) * 0.06);
+  }
+
+  const stars = sceneGroup.getObjectByName('s5stars');
+  if (stars) { stars.rotation.z += 0.004; stars.material.opacity = portalP * (0.4 + Math.sin(t * 2.5) * 0.2); }
+}
+
+/* ==========================================
+   CAMERA
+   ========================================== */
+let camZ = 12, camTZ = 12, camY = 1.5, camTY = 1.5, camRY = 0, camTRY = 0;
+
+function updateCamera() {
+  camZ = lerp(camZ, camTZ, 0.025);
+  camY = lerp(camY, camTY, 0.025);
+  camRY = lerp(camRY, camTRY, 0.03);
+  const sx = currentScene === 2 ? s3CamShake.x : 0;
+  const sy = currentScene === 2 ? s3CamShake.y : 0;
+  camera.position.x = Math.sin(camRY) * camZ + sx;
+  camera.position.z = Math.cos(camRY) * camZ;
+  camera.position.y = camY + sy;
+  camera.lookAt(0, 0, 0);
+}
+
+function setCameraForScene(idx) {
+  const cfg = [{ z: 12, y: 1.5, ry: 0 }, { z: 9, y: 2, ry: 0.4 }, { z: 8, y: 1.2, ry: 0 }, { z: 9, y: 1.8, ry: 0.15 }, { z: 10, y: 2, ry: 0 }][idx];
+  camTZ = cfg.z; camTY = cfg.y; camTRY = cfg.ry;
+}
+
+/* ==========================================
+   CANVAS 2D
+   ========================================== */
+let dust = [];
+for (let i = 0; i < (IS_MOBILE ? 40 : 90); i++) {
+  dust.push({ x: Math.random(), y: Math.random(), vx: rand(-0.0002, 0.0002), vy: rand(-0.0002, 0.0002), r: rand(0.4, 1.8), o: rand(0.03, 0.18), p: rand(0, 6.28), ps: rand(0.005, 0.025) });
+}
+
+function drawDust(alpha) {
+  const w = canvas2d.width, h = canvas2d.height;
+  for (const d of dust) {
+    d.x += d.vx; d.y += d.vy; d.p += d.ps;
+    if (d.x < 0) d.x = 1; if (d.x > 1) d.x = 0;
+    if (d.y < 0) d.y = 1; if (d.y > 1) d.y = 0;
+    ctx.beginPath(); ctx.arc(d.x * w, d.y * h, d.r, 0, 6.28);
+    ctx.fillStyle = 'rgba(0,212,255,' + (d.o * (0.3 + 0.7 * Math.sin(d.p)) * alpha) + ')';
+    ctx.fill();
+  }
+}
+
+function drawCRT() {
+  const w = canvas2d.width, h = canvas2d.height;
+  ctx.fillStyle = 'rgba(0,0,0,0.018)';
+  for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+}
+
+function drawGlitch(intensity) {
+  if (intensity <= 0) return;
+  const w = canvas2d.width, h = canvas2d.height;
+  for (let i = 0; i < intensity * 14; i++) {
+    const y = Math.random() * h;
+    ctx.fillStyle = 'rgba(0,212,255,' + (0.06 * intensity) + ')';
+    ctx.fillRect((Math.random() - 0.5) * 30 * intensity, y, w, rand(1, 6));
+  }
+  if (intensity > 0.6) {
+    ctx.fillStyle = 'rgba(255,0,50,' + (0.03 * intensity) + ')';
+    ctx.fillRect(rand(-10, 10), 0, w, h);
+  }
+}
+
+function drawPortalCanvas(t, alpha) {
+  const w = canvas2d.width, h = canvas2d.height;
+  const cx = w / 2, cy = h / 2;
+  const r = Math.min(w, h) * 0.35;
+  const grad = ctx.createRadialGradient(cx, cy, r * 0.2, cx, cy, r);
+  grad.addColorStop(0, 'rgba(0,212,255,' + (0.12 * alpha) + ')');
+  grad.addColorStop(0.5, 'rgba(123,47,247,' + (0.06 * alpha) + ')');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(t * 0.4);
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath(); ctx.arc(0, 0, r * (0.4 + i * 0.15), 0, Math.PI * 1.5);
+    ctx.strokeStyle = 'rgba(0,212,255,' + (0.1 * alpha * (1 - i * 0.2)) + ')';
+    ctx.lineWidth = 1.5; ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawHaloCanvas(t, progress) {
+  if (progress < 0.05) return;
+  const w = canvas2d.width, h = canvas2d.height;
+  const cx = w / 2, cy = h * 0.35;
+  const r = 80 + Math.sin(t * 3) * 15;
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+  grad.addColorStop(0, 'rgba(0,150,255,' + (0.2 * progress) + ')');
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.28); ctx.fill();
+}
+
+/* ==========================================
+   SUBTITLES
+   ========================================== */
+let subTimeout = null;
+function startSubtitles(text, duration) {
+  clearSubtitles();
+  const words = text.split(' ');
+  const wordDelay = (duration * 1000) / words.length;
+  subEl.innerHTML = words.map((w, i) => `<span class="sub-word" id="sw${i}">${w}</span>`).join(' ');
+  for (let i = 0; i < words.length; i++) {
+    setTimeout(() => { const el = document.getElementById('sw' + i); if (el) el.classList.add('show'); }, i * wordDelay);
+  }
+  subTimeout = setTimeout(() => {
+    for (let i = 0; i < words.length; i++) {
+      setTimeout(() => { const el = document.getElementById('sw' + i); if (el) { el.classList.remove('show'); el.classList.add('dim'); } }, i * (duration * 400 / words.length));
+    }
+  }, duration * 500);
+}
+function clearSubtitles() { clearTimeout(subTimeout); subEl.innerHTML = ''; }
+
+/* ==========================================
+   SCENE MANAGEMENT
+   ========================================== */
+let currentScene = -1, currentAudio = null, transitioning = false;
+
+function activateScene(idx) {
+  if (idx < 0 || idx >= 5 || transitioning) return;
+  transitioning = true;
+  transOverlay.classList.add('on');
+
+  setTimeout(() => {
+    clearSubtitles(); clearScene();
+    s1Rings = []; s2Strokes = []; s2Sparks = []; s2ArcTrails = []; s3Frags = []; s3Lines = []; s3LogoFragments = []; s4BurstParticles = []; s5Rings = [];
+    currentScene = idx;
+    setCameraForScene(idx);
+
+    switch (idx) {
+      case 0: createS1(); break;
+      case 1: createS2(); break;
+      case 2: createS3(); break;
+      case 3: createS4(); break;
+      case 4: createS5(); break;
+    }
+
+    if (idx === 0) doFlash(180, 0.8);
+    else if (idx === 2) doFlash(120, 0.6);
+    else if (idx === 4) doFlash(300, 0.9);
+
+    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+    currentAudio = audioEls[idx];
+    currentAudio.currentTime = 0;
+    currentAudio.play().catch(e => console.warn('Audio ' + idx + ' failed:', e));
+    bgMusic.volume = 0.12;
+
+    const dur = currentAudio.duration || 20;
+    startSubtitles(NARR[idx], dur);
+
+    currentAudio.onended = () => {
+      bgMusic.volume = 0.3; clearSubtitles();
+      if (idx < 4) { transitioning = false; activateScene(idx + 1); }
+      else { transitioning = false; showFinalScreen(); }
+    };
+
+    setTimeout(() => {
+      transOverlay.classList.remove('on');
+      setTimeout(() => { transitioning = false; }, 800);
+    }, 400);
+  }, 800);
+}
+
+function showFinalScreen() { clearSubtitles(); clearScene(); finalScreen.classList.add('on'); }
+
+/* ==========================================
+   ANIMATION LOOP
+   ========================================== */
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  const t = clock.getElapsedTime();
+  updateCamera();
+
+  let progress = 0;
+  if (currentAudio && currentAudio.duration > 0) progress = currentAudio.currentTime / currentAudio.duration;
+
+  switch (currentScene) {
+    case 0: updateS1(t, progress); break;
+    case 1: updateS2(t, progress); break;
+    case 2: updateS3(t, progress); break;
+    case 3: updateS4(t, progress); break;
+    case 4: updateS5(t, progress); break;
+  }
+
+  bloomPass.strength = 1.6 + Math.sin(t * 2) * 0.2;
+  if (currentAudio && !currentAudio.paused) { if (Math.sin(currentAudio.currentTime * 6.28) > 0.93) doFlash(18, 0.05); }
+
+  ctx.clearRect(0, 0, canvas2d.width, canvas2d.height);
+  drawDust(0.3 + Math.sin(t) * 0.1);
+  drawCRT();
+  switch (currentScene) {
+    case 2: drawGlitch(s3GlitchI * 0.7); break;
+    case 3: drawHaloCanvas(t, clamp(progress * 2, 0, 1)); break;
+    case 4: drawPortalCanvas(t, clamp(progress * 2, 0, 1) * 0.8); break;
+  }
+
+  composer.render();
+}
+
+/* ==========================================
+   START
+   ========================================== */
+document.getElementById('startScreen').onclick = () => {
+  document.getElementById('startScreen').classList.add('hide');
+  bgMusic.volume = 0.35;
+  bgMusic.play().catch(e => console.warn('BG music failed:', e));
+  activateScene(0);
+};
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  bloomPass.resolution.set(window.innerWidth * (IS_MOBILE ? 0.5 : 1), window.innerHeight * (IS_MOBILE ? 0.5 : 1));
+  resize2D();
+});
+
+animate();
+</script>
+</body>
+</html>
