@@ -26,7 +26,6 @@
       const [showOverlay, setShowOverlay] = useState(false);
       const [showButton, setShowButton] = useState(false);
       const [showStart, setShowStart] = useState(true);
-      const [elapsed, setElapsed] = useState(0);
       const startTimeRef = useRef(null);
       const intervalRef = useRef(null);
 
@@ -38,7 +37,6 @@
 
         intervalRef.current = setInterval(() => {
           const diff = Math.floor((Date.now() - startTimeRef.current) / 1000);
-          setElapsed(diff);
 
           if (diff >= TARGET_SECONDS) {
             setShowOverlay(true);
@@ -53,8 +51,6 @@
           if (intervalRef.current) clearInterval(intervalRef.current);
         };
       }, []);
-
-      const remaining = Math.max(0, TARGET_SECONDS - elapsed);
 
       return (
         <div style={{ width: '100vw', height: '100vh', background: '#050a18', position: 'relative', overflow: 'hidden' }}>
@@ -93,7 +89,6 @@
               fontSize: '0.75rem', color: '#64748b', letterSpacing: '0.1em',
               background: 'rgba(0,0,0,0.5)', padding: '0.4rem 0.8rem', borderRadius: '6px'
             }}>
-              Texto aparece en: {remaining}s
             </div>
           )}
 
