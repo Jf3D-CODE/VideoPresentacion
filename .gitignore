@@ -21,7 +21,15 @@ Desktop.ini
 *.rar
 *.7z
 
-# Large media files (if not needed in repo)
+# Large media files
 *.glb
 *.stl
 *.3mf
+*.mp4
+*.mp3
+*.wav
+*.exe
+
+# Node
+node_modules/
+package-lock.json
