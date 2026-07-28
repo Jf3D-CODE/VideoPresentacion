@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JF Diseños 3D - Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --blue-glow: #2563eb;
+      --purple: #8b5cf6;
+      --dark: #050a18;
+    }
+    html, body { width: 100%; height: 100%; background: var(--dark); font-family: 'Inter', sans-serif; color: #e2e8f0; overflow: hidden; }
+  </style>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    function Showcase() {
+      const videoRef = useRef(null);
+      const [showOverlay, setShowOverlay] = useState(false);
+      const [showButton, setShowButton] = useState(false);
+      const [showStart, setShowStart] = useState(true);
+      const [videoEnded, setVideoEnded] = useState(false);
+
+      const TARGET_TIME = 91;
+
+      useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const handleTimeUpdate = () => {
+          const current = video.currentTime;
+
+          if (current >= TARGET_TIME - 0.5) {
+            setShowOverlay(true);
+            setTimeout(() => setShowButton(true), 1500);
+          } else {
+            setShowOverlay(false);
+            setShowButton(false);
+          }
+        };
+
+        video.addEventListener('timeupdate', handleTimeUpdate);
+
+        return () => {
+          video.removeEventListener('timeupdate', handleTimeUpdate);
+        };
+      }, []);
+
+      const handleStart = () => {
+        setShowStart(false);
+        videoRef.current.play();
+      };
+
+      return (
+        <div style={{ width: '100vw', height: '100vh', background: '#050a18', position: 'relative', overflow: 'hidden' }}>
+          {/* Start Screen */}
+          {showStart && (
+            <div
+              onClick={handleStart}
+              style={{
+                position: 'absolute', inset: 0, zIndex: 100,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                background: 'radial-gradient(ellipse at 50% 40%, rgba(37,99,235,0.08) 0%, #050a18 60%)',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{
+                width: 'clamp(80px,18vw,140px)', height: 'clamp(80px,18vw,140px)', marginBottom: '2.5rem',
+                animation: 'logoFloat 4s ease-in-out infinite'
+              }}>
+                <img
+                  src="../musica/logo-website.png"
+                  alt="JF Diseños 3D"
+                  style={{
+                    width: '100%', height: '100%', objectFit: 'contain',
+                    filter: 'drop-shadow(0 0 40px rgba(59,130,246,0.3))',
+                    animation: 'logoPulse 3s ease-in-out infinite'
+                  }}
+                />
+              </div>
+              <div style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 'clamp(2rem,7vw,4.5rem)', fontWeight: 700,
+                letterSpacing: '-0.02em', lineHeight: 1.1,
+                background: 'linear-gradient(135deg,#fff 0%,#60a5fa 50%,#a78bfa 100%)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text', textAlign: 'center', marginBottom: '0.8rem'
+              }}>
+                JF DISEÑOS 3D
+              </div>
+              <div style={{
+                fontSize: 'clamp(0.7rem,1.8vw,0.95rem)',
+                color: '#64748b', letterSpacing: '0.2em', textTransform: 'uppercase',
+                fontWeight: 400, marginBottom: '3rem'
+              }}>
+                Impresión 3D & Diseño Personalizado
+              </div>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '0.75rem',
+                padding: '1rem 2.5rem', borderRadius: '100px',
+                background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.25)',
+                color: '#60a5fa', fontSize: '0.85rem', fontWeight: 500,
+                letterSpacing: '0.15em', textTransform: 'uppercase',
+                transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)'
+              }}>
+                <div style={{
+                  width: 0, height: 0,
+                  borderTop: '6px solid transparent', borderBottom: '6px solid transparent',
+                  borderLeft: '10px solid #60a5fa', marginLeft: '2px'
+                }} />
+                EXPERIENCIA
+              </div>
+              <div style={{
+                position: 'absolute', bottom: '2.5rem',
+                fontSize: '0.7rem', color: '#64748b', letterSpacing: '0.1em', opacity: 0.5
+              }}>
+                Hacé click para comenzar
+              </div>
+            </div>
+          )}
+
+          {/* Video */}
+          <video
+            ref={videoRef}
+            src="../VIDEO/VIDEO.mp4"
+            style={{
+              width: '100%', height: '100%', objectFit: 'cover',
+              opacity: showStart ? 0 : 1, transition: 'opacity 1s ease'
+            }}
+            playsInline
+          />
+
+          {/* Overlay: "DESCUBRI TU MUNDO IMPRIMI TU REALIDAD" */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            pointerEvents: 'none', zIndex: 20,
+            opacity: showOverlay ? 1 : 0, transition: 'opacity 1.5s cubic-bezier(0.4,0,0.2,1)'
+          }}>
+            <div style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: 'clamp(1.5rem,5vw,4rem)', fontWeight: 800,
+              textAlign: 'center', lineHeight: 1.2, padding: '0 2rem',
+              background: 'linear-gradient(135deg, #fff 0%, #60a5fa 50%, #a78bfa 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              textShadow: 'none',
+              filter: 'drop-shadow(0 0 30px rgba(59,130,246,0.4))',
+              animation: showOverlay ? 'textGlow 3s ease-in-out infinite' : 'none'
+            }}>
+              DESCUBRÍ TU MUNDO
+              <br />
+              CREÁ TU DESTINO
+            </div>
+
+            {/* Button */}
+            <a
+              href="https://www.tienda-simple.com.ar/tienda/jf-disenos-3d"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.6rem',
+                marginTop: '2rem',
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: 'clamp(0.85em,2vw,1.1em)', fontWeight: 600,
+                color: '#fff', textDecoration: 'none', letterSpacing: '0.08em',
+                padding: '1.1em 2.8em', borderRadius: '100px',
+                background: 'linear-gradient(135deg, #2563eb, #8b5cf6)',
+                border: 'none', cursor: 'pointer', pointerEvents: 'auto',
+                transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
+                boxShadow: '0 4px 24px rgba(37,99,235,0.4), 0 0 0 1px rgba(59,130,246,0.3)',
+                opacity: showButton ? 1 : 0,
+                transform: showButton ? 'translateY(0)' : 'translateY(20px)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 8px 40px rgba(37,99,235,0.6), 0 0 0 1px rgba(59,130,246,0.5)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 24px rgba(37,99,235,0.4), 0 0 0 1px rgba(59,130,246,0.3)';
+              }}
+            >
+              IR A TIENDA
+              <span style={{ fontSize: '1.2em', transition: 'transform 0.3s' }}>→</span>
+            </a>
+          </div>
+
+          {/* Bottom bar */}
+
+          <style>{`
+            @keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+            @keyframes logoPulse { 0%,100%{filter:drop-shadow(0 0 40px rgba(59,130,246,0.3))} 50%{filter:drop-shadow(0 0 60px rgba(59,130,246,0.5))} }
+            @keyframes textGlow { 0%,100%{filter:drop-shadow(0 0 30px rgba(59,130,246,0.4))} 50%{filter:drop-shadow(0 0 50px rgba(59,130,246,0.7))} }
+          `}</style>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Showcase />);
+  </script>
+</body>
+</html>
