@@ -16,6 +16,10 @@
       --dark: #050a18;
     }
     html, body { width: 100%; height: 100%; background: var(--dark); font-family: 'Inter', sans-serif; color: #e2e8f0; overflow: hidden; }
+    @keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes logoPulse { 0%,100%{filter:drop-shadow(0 0 40px rgba(59,130,246,0.3))} 50%{filter:drop-shadow(0 0 60px rgba(59,130,246,0.5))} }
+    @keyframes textGlow { 0%,100%{filter:drop-shadow(0 0 30px rgba(59,130,246,0.4))} 50%{filter:drop-shadow(0 0 50px rgba(59,130,246,0.7))} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
   </style>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -24,48 +28,32 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
+    const { useState, useEffect } = React;
 
     function Showcase() {
-      const videoRef = useRef(null);
       const [showOverlay, setShowOverlay] = useState(false);
       const [showButton, setShowButton] = useState(false);
       const [showStart, setShowStart] = useState(true);
-      const [videoEnded, setVideoEnded] = useState(false);
 
-      const TARGET_TIME = 91;
+      const TARGET_SECONDS = 91;
 
       useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
+        if (showStart) return;
 
-        const handleTimeUpdate = () => {
-          const current = video.currentTime;
+        const timer = setTimeout(() => {
+          setShowOverlay(true);
+          setTimeout(() => setShowButton(true), 1500);
+        }, TARGET_SECONDS * 1000);
 
-          if (current >= TARGET_TIME - 0.5) {
-            setShowOverlay(true);
-            setTimeout(() => setShowButton(true), 1500);
-          } else {
-            setShowOverlay(false);
-            setShowButton(false);
-          }
-        };
-
-        video.addEventListener('timeupdate', handleTimeUpdate);
-
-        return () => {
-          video.removeEventListener('timeupdate', handleTimeUpdate);
-        };
-      }, []);
+        return () => clearTimeout(timer);
+      }, [showStart]);
 
       const handleStart = () => {
         setShowStart(false);
-        videoRef.current.play();
       };
 
       return (
         <div style={{ width: '100vw', height: '100vh', background: '#050a18', position: 'relative', overflow: 'hidden' }}>
-          {/* Start Screen */}
           {showStart && (
             <div
               onClick={handleStart}
@@ -131,18 +119,17 @@
             </div>
           )}
 
-          {/* Video */}
-          <video
-            ref={videoRef}
-            src="https://drive.google.com/uc?export=download&id=1ZfPNYHsl4mm__a_tgIk4vNaX-fY3r3YN"
+          <iframe
+            src="https://drive.google.com/file/d/1ZfPNYHsl4mm__a_tgIk4vNaX-fY3r3YN/preview"
             style={{
-              width: '100%', height: '100%', objectFit: 'cover',
-              opacity: showStart ? 0 : 1, transition: 'opacity 1s ease'
+              width: '100%', height: '100%', border: 'none',
+              opacity: showStart ? 0 : 1, transition: 'opacity 1s ease',
+              position: 'absolute', inset: 0
             }}
-            playsInline
+            allow="autoplay"
+            allowFullScreen
           />
 
-          {/* Overlay: "DESCUBRI TU MUNDO IMPRIMI TU REALIDAD" */}
           <div style={{
             position: 'absolute', inset: 0,
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -164,7 +151,6 @@
               CREÁ TU DESTINO
             </div>
 
-            {/* Button */}
             <a
               href="https://www.tienda-simple.com.ar/tienda/jf-disenos-3d"
               target="_blank"
@@ -193,17 +179,9 @@
               }}
             >
               IR A TIENDA
-              <span style={{ fontSize: '1.2em', transition: 'transform 0.3s' }}>→</span>
+              <span style={{ fontSize: '1.2em' }}>→</span>
             </a>
           </div>
-
-          {/* Bottom bar */}
-
-          <style>{`
-            @keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-            @keyframes logoPulse { 0%,100%{filter:drop-shadow(0 0 40px rgba(59,130,246,0.3))} 50%{filter:drop-shadow(0 0 60px rgba(59,130,246,0.5))} }
-            @keyframes textGlow { 0%,100%{filter:drop-shadow(0 0 30px rgba(59,130,246,0.4))} 50%{filter:drop-shadow(0 0 50px rgba(59,130,246,0.7))} }
-          `}</style>
         </div>
       );
     }
